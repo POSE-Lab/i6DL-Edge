@@ -1,0 +1,8 @@
+git
+libssl-dev
+libusb-1.0-0-dev
+libudev-dev
+pkg-config
+libgtk-3-dev
+ros-noetic-ddynamic-reconfigure
+v4l-utils 

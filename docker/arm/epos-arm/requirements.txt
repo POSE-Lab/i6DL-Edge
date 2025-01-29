@@ -1,0 +1,11 @@
+pandas
+scipy
+pyyaml
+tabulate
+imageio==2.9.0
+glog
+pypng
+pillow
+onnxruntime-gpu
+absl-py
+packaging

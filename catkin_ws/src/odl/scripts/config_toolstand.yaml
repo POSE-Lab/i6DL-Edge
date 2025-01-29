@@ -1,0 +1,63 @@
+# Configuration file for the toolstand detection pipeline
+
+# The size of the ArUco Marker in mm.
+ArUco_dict: "DICT_4X4_50"
+grid_board:
+  "rows": 10
+  "columns": 5
+  "mrk_size": 40
+  "mrk_space": 5
+
+# The calibration matrix of the camera
+K: [641.4420166015625, 0.0, 631.1490478515625, 0.0, 639.983154296875, 363.1187744140625, 0.0, 0.0, 1.0]
+#K: [423.87,0.0,318.680359,0.0,423.074,242.9749,0.0,0.0,1.0]
+#K: [389.204,0.0,317.161,0.0,389.204,240.42,0.0,0.0,1.0]
+# The distortion coefficients of the camera
+#dist_coeffs: [-0.0559442974627018, 0.06317324936389923, -0.0007526116678491235, -0.0012245811522006989, -0.01939592882990837]
+dist_coeffs: None
+
+toolstand_map:
+    "-10": "10"
+    "-21": "21"
+    "-22": "22"
+# The fixed translation of the UL marker to the 
+# toolstand center (expressed in the 3D model axes of the toolstand)
+UL_MARKER_TO_TOOLSTAND_T: [-198.716,-95.57,155.823]
+
+# The rotation of the local opencv system (marker coordinate frame)
+# to align with the 3D model's coordinate frame 
+# Note: the rotation is composed interannally in the .py file
+CV_AXES_TO_TOOLSTAND_MODEL_AXES_ROT: 
+  "x": -90
+  "y": -90
+  "z": 0
+
+
+toolstand_model_path: "/media/panos/Seagate/FELICE/data_aquizition_crf/code/toolstand_detection/vis/decimated"
+# The minimum number of markers to detect to compute a pose
+detected_marker_threshold: 1
+reprojection_error_threshold: 6 # TODO based on WS ID
+
+# Refinment of the calculated poses of the markers
+refine_markers : False
+
+# Run unit tests in startup
+perform_unit_tests_on_startup: False
+
+# visualize toolstand location
+vis: True
+
+
+# for the workstation 20 ONLY!!!!
+SHEET_OFFSET: [300,0,0]
+UL_CORNER_TO_LEFT_TOOL_HOLDER: [-110,-190.,0]
+UL_CORNER_TO_RIGHT_TOOL_HOLDER: [-320,-190,0]
+UL_CORNER_B2_TO_RIGHT_TOOL_HOLDER: [0,-190,0]
+RIGHT_TOOL_HOLDER_TO_LEFT_TOOL_HOLDER: [200,-190,0]
+
+# vertical markers
+SHEET_OFFSET_VERTICAL: [500,0,0] # y,z
+UL_CORNER_TO_LEFT_TOOL_HOLDER_VERTICAL: [-145,-180,200] # 
+UL_CORNER_TO_RIGHT_TOOL_HOLDER_VERTICAL: [-375,-180,200]
+
+
