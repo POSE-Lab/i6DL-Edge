@@ -1,0 +1,3 @@
+[submodule "external/progressive-x"]
+	path = external/progressive-x
+	url = https://github.com/danini/progressive-x
