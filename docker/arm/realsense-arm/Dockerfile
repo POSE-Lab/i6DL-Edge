@@ -23,19 +23,3 @@ ENV HOME=/root/
 # Create and initialize a catkin workspace
 RUN mkdir -p ${HOME}/catkin_ws/src && \
 source /opt/ros/noetic/setup.bash && catkin_init_workspace
-
-#&& cd ~/catkin_ws/src/ &&\
-#git clone https://github.com/IntelRealSense/realsense-ros.git &&\ 
-#source /opt/ros/noetic/setup.bash &&\
-#cd ~/catkin_ws/src/realsense-ros/ &&\
-#git checkout `git tag | sort -V | grep -P "^2.\d+\.\d+" | tail -1` &&\
-#cd .. &&\
-#sudo apt-get install -y ros-noetic-cv-bridge ros-noetic-image-transport ros-noetic-diagnostic-updater &&\
-#catkin_init_workspace &&\
-#cd .. && \
-#catkin_make clean &&\
-#catkin_make -DCATKIN_ENABLE_TESTING=False -DCMAKE_BUILD_TYPE=Release &&\
-#catkin_make install
-
-# RUN echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc &&\
-# source ~/.bashrc

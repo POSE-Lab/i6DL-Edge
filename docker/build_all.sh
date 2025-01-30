@@ -1,4 +1,4 @@
-# utility script for building the ARM images
+# utility script for building the Docker images
 if [ $# -ne 2 ]; then
   echo -e "Please provide a valid image tag and target architecture"
   exit 1

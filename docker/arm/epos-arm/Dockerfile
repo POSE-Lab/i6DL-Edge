@@ -39,23 +39,6 @@ ENV PYTHONPATH=$REPO_PATH_DST/external/slim:$PYTHONPATH
 
 ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$REPO_PATH_DST/external/llvm/lib
 
-# The installation locations of OSMesa and LLVM:
-# ENV OSMESA_PREFIX=$REPO_PATH_DST/external/osmesa
-# ENV LLVM_PREFIX=$REPO_PATH_DST/external/llvm
-
-# RUN mkdir -p $OSMESA_PREFIX &&\
-# mkdir -p $LLVM_PREFIX &&\
-# cd $REPO_PATH_DST/external/bop_renderer/osmesa-install &&\
-# mkdir -p ./build &&\
-# cd ./build &&\
-# bash ../osmesa-install.sh
-
-# RUN cd $REPO_PATH_DST/external/bop_renderer &&\
-# mkdir -p ./build &&\
-# cd ./build &&\
-# cmake .. -DCMAKE_BUILD_TYPE=Release &&\
-# make -j8
-
 RUN mkdir -p $REPO_PATH_DST/external/progressive-x/build &&\
 cd $REPO_PATH_DST/external/progressive-x/build &&\
 cmake .. -DCMAKE_BUILD_TYPE=Release &&\

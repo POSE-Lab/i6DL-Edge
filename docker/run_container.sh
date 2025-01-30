@@ -8,8 +8,8 @@ TAG=$2
 
 USER_CONTAINER=root
 WS_CONTAINER="/$USER_CONTAINER/catkin_ws/"
-WS_HOST="$(pwd)/catkin_ws"
-SANDBOX_HOST="$(pwd)/sandbox/"
+WS_HOST="$(pwd)/../catkin_ws"
+SANDBOX_HOST="$(pwd)/../sandbox/"
 SANDBOX_CONTAINER="/$USER_CONTAINER/sandbox/"
 
 xhost +

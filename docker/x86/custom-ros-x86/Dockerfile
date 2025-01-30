@@ -15,7 +15,7 @@ RUN cd /tmp &&\
     make -j8 && \
     make install 
 
-RUN apt install -y wget 
+RUN apt-get update && apt-get install -y wget 
 ## Setup ROS
 COPY ./docker/x86/custom-ros-x86/ros_packages.txt ./ros_packages.txt 
 RUN echo "deb http://packages.ros.org/ros/ubuntu ${RELEASE} main" > /etc/apt/sources.list.d/ros-latest.list

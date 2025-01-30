@@ -25,10 +25,6 @@ RUN echo "deb https://repo.download.nvidia.com/jetson/common ${JETPACK_SHORT_VER
 RUN apt update && apt-get install -y cuda-libraries-dev-11-4  \
 libcudnn8-dev 
 
-#COPY ./packages.txt ./packages.txt
-#RUN apt-get update && xargs -a ./packages.txt apt-get install -y &&\
-#pip3 install --upgrade pip && pip3 uninstall numpy && pip3 install "numpy<1.24"
-
 ENV PKG_CONFIG=/usr/bin/pkg-config
 
 # Install Opencv 4.7.0, modified to not require 6 points for pose estimation from 3D-2D point correspondences
@@ -36,18 +32,18 @@ ARG BRANCH_NAME=4.7.0-modified
 ARG OPENCV_VERSION=4.7.0
 ARG OPENCV_REPO=https://github.com/opencv/opencv.git
 ARG OPENCV_CONTRIB=https://github.com/opencv/opencv_contrib.git
-ARG OPENCV_FORK=https://github.com/athnzc/opencv.git
-#ARG OPENCV_CONTRIB_FORK=https://github.com/athnzc/opencv_contrib.git
+ARG OPENCV_FORK=https://github.com/POSE-Lab/opencv_fork.git
+
 RUN cd ./tmp && \
     git clone $OPENCV_FORK &&\
     git clone $OPENCV_CONTRIB &&\
-    cd opencv && \
+    cd opencv_fork && \
     git checkout $BRANCH_NAME &&\
     cd ../opencv_contrib &&\
     git checkout tags/$OPENCV_VERSION &&\
-    cd ../opencv
-RUN     mkdir -p /tmp/opencv/build && \
-        cd /tmp/opencv/build && \
+    cd ../opencv_fork
+RUN     mkdir -p /tmp/opencv_fork/build && \
+        cd /tmp/opencv_fork/build && \
          cmake \
         -D CMAKE_INSTALL_PREFIX=/usr/local \
           -D BUILD_TIFF=ON \
@@ -99,6 +95,6 @@ RUN     mkdir -p /tmp/opencv/build && \
           -D CMAKE_BUILD_TYPE=Release \
           -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib/modules .. &&\
     	    make -j8 install &&\
-   	   rm -r /tmp/opencv && \
+   	   rm -r /tmp/opencv_fork && \
     	 rm -r /tmp/opencv_contrib
 

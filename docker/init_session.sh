@@ -29,28 +29,18 @@ if [ $? -ne 0 ]; then
   tmux split-window -v
   tmux select-pane -t 0
   tmux split-window -v
-  #for pane in $(tmux list-panes -F '#P'); do
-  #  tmux send-keys ${pane} "echo Pane ${pane}" Enter
-    #tmux send-keys -t ${pane} 'clear' Enter
-  #done
-  tmux send-keys -t 1 "./run_with_ros.sh $IMAGE $TAG $ENV_FILE" Enter
+
+  tmux send-keys -t 1 "./run_container.sh $IMAGE $TAG $ENV_FILE" Enter
   tmux select-pane -t 1
   if [ "$ARCH" == "aarch64" ]; then
-    tmux send-keys -t 1 "export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1" Enter # TODO: should be different for x86
+    tmux send-keys -t 1 "export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1" Enter 
   fi
   sleep 3
   tmux send-keys -t 2 './run_new.sh' Enter
   tmux send-keys -t 0 "./launch_camera.sh $CAM_RES" Enter
   sleep 5
   tmux send-keys -t 1 "./entrypoint.sh" Enter
-  
-  #tmux split-window -v
-  # tmux select-pane -t 1
-  # tmux resize-pane -D 3
-  # tmux select-pane -t 0
-  # tmux resize-pane -U 2
-  #tmux send-keys -t 2 'top' Enter
-  #tmux send-keys -t 2 Shift+M 
+
   tmux set -g mouse on
   tmux -2 attach-session -d
   
