@@ -3,9 +3,9 @@
 #input_resolution : [720,1280,3] # Change for other resolution!! Either 1280 x 720 or 640 x 480
 input_resolution : [480,640,3]
 
-# Object id's the current model is trained on
+# Object IDs the current model is trained on
 obj_ids : [1,2,3,4,5]
-decimated_objects_path: /root/sandbox/bop_datasets/felice/decimated_models_prj/
+decimated_objects_path: /root/sandbox/decimated_models_prj/
 object_map:
   {
     "1": 1, # Makita DFT
@@ -28,43 +28,29 @@ K_640: [425.22237339, 0.0, 318.82263184, 0.0, 425.06344477, 242.34793091, 0.0, 0
 # Methods used for inference
 method: 'onnx'
 #method: 'trt'
-#trt: "/root/sandbox/tf_models/crf123AndLab123MI3_640_trt.engine"
-#trt: "/root/sandbox/tf_models/crfAndLab12/crfAndLab12_1280_720_reannot_int8.engine"
 #trt : "/root/sandbox/tf_models/crf12345AndLab123MI3_640_fp16.engine" # stable fp16 for objects 1,13 (640,480) # STABLE!!!
 
-#onnx : "/root/sandbox/tf_models/fair_correct.onnx" # Turin fair model
-#trt : "/root/sandbox/tf_models/fair_correct_fp16.engine" # Turin fair model
-
-#trt : "/root/sandbox/tf_models/crfAndLab12/crfAndLab12_1280_720_reannot_IN8_trt_exec.engine"
+# Path to ONNX model
 onnx: "/root/sandbox/tf_models/crf12345AndLab123MI3/crf12345AndLab123MI3_640.onnx"
-#onnx: "/root/sandbox/tf_models/crf123AndLab123MI3_640.onnx" # stable onnx model for objects 1,2,13 (640x480)
-#onnx : "/root/sandbox/tf_models/crfAndLab12/crfAndLab12_640_480.onnx" # stable onnx model for objects 1,13 (640x480)
-#onnx: "/root/sandbox/tf_models/crfAndLab12/crfAndLab12_1280_720_reannot.onnx"
-#onnx: "/root/sandbox/tf_models/crfAndLab12/crfAndLab12_onnx.onnx"
+
 # Perform warmup during initialization
 warmup: True
 
 # Path of initialization image, must be of the same resolution with the current 
 # camera input resolution
-init_image_path : "/root/sandbox/init_images/images_640_480/000000.png" # uncomment to use 640 x 480 image for initialization when using a model trained on images of size 640 x 480 
-
-#init_image_path : "/root/sandbox/init_images/images_1280_720/000011.png"
+init_image_path : "/root/sandbox/init_images/images_640_480/000061.png" # uncomment to use 640 x 480 image for initialization when using a model trained on images of size 640 x 480 
 
 # Path to store related visualizations including the captured image
 # Don't forget to enable visualizations at visualization section below
-vis_path: '/root/sandbox/results/test_18_06_2024' #turin_fair_2' #test640
-corr_path: '/root/sandbox/results/test_18_06_2024' #turin_fair_2' #test640
-# vis_path: '/root/sandbox/results/trt_test/test640' #test640
-# corr_path: '/root/sandbox/results/trt_test/test640' #test640
+vis_path: '/root/sandbox/results/test_31_01_2025' 
+corr_path: '/root/sandbox/results/test_31_01_2025' 
+
 save_Image: True
 clear_store_path: False # Delete all test folders when a new session begins
-testMode: True #test_image_path: "/root/sandbox/test_images/foam_base.png" # for 640
-#test_image_path: "/root/sandbox/AGX_check/640/Test_2023_10_19_141839/Obj_1/image_raw.png"
-#test_image_path: "/root/sandbox/AGX_check/1280/Test_2023_10_19_131545/Obj_1/image_raw.png"
-#test_image_path: "/root/sandbox/test_images/obj_1_test.png" #for 1280
-test_image_path: "/root/sandbox/test_images/000328.png"
+testMode: False #test_image_path: "/root/sandbox/test_images/foam_base.png" # for 640
+test_image_path: "/root/sandbox/test_images/000061.png"
 # EPOS related flags
-dataset : "felice" 
+dataset : "IndustryShapes" 
 task_type : 'localization' 
 decoder_output_stride : [4]
 num_frags : 64

@@ -87,7 +87,7 @@ class cameraInput:
                 if self.saveImage:
                     path = self.eposObj.vis_path +"/image_raw" # TODO
                     print("image was taken at ", self.timestamp)
-                    print("Creating direcotories...")
+                    print("Creating directories...")
                     self.current_working_dir = make_test_dirs(path,self.timestamp,self.objectId,self.profiler)
                     save_Image(path,self.rgb,self.timestamp,self.objectId,self.profiler)
                 

@@ -44,3 +44,4 @@ RUN echo "deb https://repo.download.nvidia.com/jetson/common r35.2 main" >> /etc
 apt-get update && apt-get -y install python3-libnvinfer-dev libnvinfer-bin
 #RUN export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 RUN pip install plyfile
+COPY ./docker/launch_camera.sh .

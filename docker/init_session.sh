@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
   fi
   sleep 3
   tmux send-keys -t 2 './run_new.sh' Enter
-  tmux send-keys -t 0 "./launch_camera.sh $CAM_RES" Enter
+  tmux send-keys -t 0 "./run_new.sh" Enter
   sleep 5
   tmux send-keys -t 1 "./entrypoint.sh" Enter
 

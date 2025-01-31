@@ -27,3 +27,5 @@ RUN pip3 install pycuda --verbose
 RUN pip install tensorrt
 RUN pip install plyfile
 RUN apt-get update && apt-get install -y ros-noetic-rqt-image-view
+
+COPY ./docker/launch_camera.sh .

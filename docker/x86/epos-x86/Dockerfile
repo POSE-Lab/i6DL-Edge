@@ -32,3 +32,5 @@ cd $REPO_PATH_DST/external/progressive-x/build &&\
 sudo cmake .. -DCMAKE_BUILD_TYPE=Release &&\
 sudo make -j8
 
+RUN pip install onnxruntime-gpu --index-url https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/onnxruntime-cuda-11/pypi/simple/
+

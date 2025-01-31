@@ -24,15 +24,7 @@ def get_camera_params(datasets_path, dataset_name, cam_type=None):
   :param cam_type: Type of camera.
   :return: Dictionary with camera parameters for the specified dataset.
   """
-
-  
   if dataset_name=='spreader':
-    if cam_type is None:
-      cam_type = 'primesense'
-    cam_filename = 'camera_{}.json'.format(cam_type)
-  
-  elif dataset_name == 'felice':
-    # Includes images captured by three sensors. Use Primesense as default.
     if cam_type is None:
       cam_type = 'primesense'
     cam_filename = 'camera_{}.json'.format(cam_type)
@@ -48,6 +40,11 @@ def get_camera_params(datasets_path, dataset_name, cam_type=None):
     cam_filename = 'camera_{}.json'.format(cam_type)
 
   elif dataset_name == 'carObj13':
+    if cam_type is None:
+      cam_type = 'primesense'
+    cam_filename = 'camera_{}.json'.format(cam_type)
+
+  elif dataset_name == 'IndustryShapes':
     if cam_type is None:
       cam_type = 'primesense'
     cam_filename = 'camera_{}.json'.format(cam_type)
@@ -102,9 +99,9 @@ def get_model_params(datasets_path, dataset_name, model_type=None):
   # Object ID's.
   obj_ids = {
     'spreader':[1],
-    'felice': [1,2,3,4,5],
     'carObj1': [1,2],
     'carObj13': [13],
+    'IndustryShapes':[1,2,3,4,5],
     'lm': list(range(1, 16)),
     'lmo': [1, 5, 6, 8, 9, 10, 11, 12],
     'tless': [1], # list(range(1, 31)),
@@ -123,9 +120,9 @@ def get_model_params(datasets_path, dataset_name, model_type=None):
   # function (the others are evaluated using ADD). See Hodan et al. (ECCVW'16).
   symmetric_obj_ids = {
     'spreader':[1],
-    'felice': [1,2,3,4,5],
     'carObj1': [1,2],
     'carObj13': [13],  # list(range(1, 3)),
+    'IndustryShapes':[1,3,5],
     'lm': [3, 7, 10, 11],
     'lmo': [10, 11],
     'tless': list(range(1, 31)),
@@ -145,13 +142,13 @@ def get_model_params(datasets_path, dataset_name, model_type=None):
   if dataset_name =='spreader' and model_type is None:
     model_type = 'cad'
 
-  if dataset_name =='felice' and model_type is None:
-    model_type = 'cad'
-
   if dataset_name =='carObj1' and model_type is None:
     model_type = 'cad'
 
   if dataset_name =='carObj13' and model_type is None:
+    model_type = 'cad'
+
+  if dataset_name =='IndustryShapes' and model_type is None:
     model_type = 'cad'
     
   if dataset_name == 'tless' and model_type is None:
@@ -240,22 +237,7 @@ def get_split_params(datasets_path, dataset_name, split, split_type=None):
     #panos added ranges for rendering training images
     p['azimuth_range'] = (0, 2 * math.pi)
     p['elev_range'] = (0 * math.pi, 0.5 * math.pi)
-  
-  elif dataset_name == 'felice':
-    p['scene_ids']=[1]
     
-    if split_type is None:
-      split_type = 'primesense'
-      
-    p['im_size']={
-      'train':{
-      	'primesense': (640, 480) #1280,720
-      },
-      'test':{
-        'primesense': (640, 480)
-      }
-    }[split][split_type]
-
   # car
   elif dataset_name == 'carObj1':
     if split == 'train':
@@ -292,16 +274,22 @@ def get_split_params(datasets_path, dataset_name, split, split_type=None):
     elif split == 'test':
       p['scene_ids'] = [13]#list(range(1, 21)) # TODO car
 
+  elif dataset_name == 'IndustryShapes':
+    if split == 'train':
+      p['scene_ids'] = list(range(1,12)) #list(range(1, 3)) # TODO car
+    elif split == 'test':
+      p['scene_ids'] = list(range(1,9))#list(range(1, 21)) # TODO car
+
     # Use images from the Primesense sensor by default.
     if split_type is None:
       split_type = 'primesense'
 
     p['im_size'] = {
       'train': {
-        'primesense': (1280, 720) # TODO car resolution
+        'primesense': (640, 480) # TODO car resolution
       },
       'test': {
-        'primesense': (1280, 720) # TODO car resolution
+        'primesense': (640, 480) # TODO car resolution
       }
     }[split][split_type]
 

@@ -24,7 +24,7 @@ class EposModel:
         print('\n'.join("%s: %s" % item for item in attrs.items()))
         # load models for fragmentation
         self.model_store_frag = datagen.ObjectModelStore(
-        dataset_name='felice',
+        dataset_name='IndustryShapes',
         model_type='cad',
         num_frags=self.num_frags,
         prepare_for_projection=self.project_to_surface) # dataset_name='carObj1'
@@ -35,7 +35,7 @@ class EposModel:
         frag_sizes = self.model_store_frag.frag_sizes
 
         self.model_store = datagen.ObjectModelStore(
-            dataset_name='felice',
+            dataset_name='IndustryShapes',
             model_type='cad',
             num_frags=self.num_frags,
             frag_centers=frag_centers,
