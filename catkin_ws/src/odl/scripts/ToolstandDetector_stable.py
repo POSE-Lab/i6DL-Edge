@@ -131,9 +131,11 @@ class ToolstandDetector():
         return rt_final, self.calc_confidence(image_points,object_points,self.rvec,self.tvec,np.array(self.K).reshape(3,3),WS_id,len(num_detected),repr_threshold = self.reprojection_error_threshold) # num_detected new
     
     
-    def visualize(self,savePath):
+    def visualize(self,savePath, imgname):
 
         K = np.array(self.K).reshape(3,3)
-        cv.drawFrameAxes(self.rgb,K,None,self.rvec,self.tvec,length=80)
+        cv.drawFrameAxes(self.rgb,K,None,self.predicted_pose[:3,:3],self.predicted_pose[:-1,-1],length=80)
         cv.aruco.drawDetectedMarkers(self.rgb, self.corners,self.ids)
-        cv.imwrite(os.path.join(savePath,"result.png"),self.rgb)
+        cv.imwrite(os.path.join(savePath,imgname +".png"),self.rgb)
+
+
