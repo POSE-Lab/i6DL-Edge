@@ -53,7 +53,7 @@ def runODL(args):
     # instantiate a profiler object
     profiler = Profiler()
     
-    # initlize epos model
+    # initialize epos model
     eposObj = EposModel(data,profiler)
 
     # initialize Toolstand detector
@@ -73,7 +73,7 @@ def runODL(args):
     # asychronously publish health message
     sendHealthMsg()
     
-    # subscrive to the camera topics
+    # subscribe to the camera topics
     rospy.Subscriber('/camera/color/image_raw', Image, camera.callbackRGBImage)
     rospy.Subscriber('/camera/color/camera_info', CameraInfo, camera.callbackCameraInfo)
     

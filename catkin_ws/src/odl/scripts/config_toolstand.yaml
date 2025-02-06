@@ -26,19 +26,19 @@ UL_MARKER_TO_TOOLSTAND_T: [-198.716,-95.57,155.823]
 
 # The rotation of the local opencv system (marker coordinate frame)
 # to align with the 3D model's coordinate frame 
-# Note: the rotation is composed interannally in the .py file
+# Note: the rotation is composed internally in the respective .py file
 CV_AXES_TO_TOOLSTAND_MODEL_AXES_ROT: 
   "x": -90
   "y": -90
   "z": 0
 
 
-toolstand_model_path: "/media/panos/Seagate/FELICE/data_aquizition_crf/code/toolstand_detection/vis/decimated"
+toolstand_model_path: ""
 # The minimum number of markers to detect to compute a pose
 detected_marker_threshold: 1
 reprojection_error_threshold: 6 # TODO based on WS ID
 
-# Refinment of the calculated poses of the markers
+# Refinement of the calculated poses of the markers
 refine_markers : False
 
 # Run unit tests in startup

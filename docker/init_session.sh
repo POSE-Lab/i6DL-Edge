@@ -3,8 +3,8 @@
 #get name of session from command line 
 # if the session is not already running, create a new session,
 # otherwise just attach to it.
-if [ $# -lt 3 ]; then
-  echo -e "Please provide at least 3 arguments\nMandatory: session name, image tag, camera resolution (1280 for high res, 640 for low res)\nOptional: environment variables file"
+if [ $# -lt 2 ]; then
+  echo -e "Please provide 2 arguments:\nsession name, image tag"
   exit 1
 fi
 
@@ -16,7 +16,7 @@ elif [ "$ARCH" == "x86_64" ]; then
 fi
 
 TAG=$2
-CAM_RES=$3
+#CAM_RES=$3
 ENV_FILE=$4
 
 tmux has-session -t $1

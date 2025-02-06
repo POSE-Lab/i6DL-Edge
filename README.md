@@ -1,5 +1,5 @@
 # i6DL-Edge
-The module uses as baseline method the [EPOS](https://github.com/thodan/epos) (Estimating 6D Pose of Objects with Symmetries) method, adapted as a ROS1 service for integration on robotic platforms. Moreover, optimizations for improved time performance have been integrated, as well as support for deployment in Docker containers. The module can run on **x86_64** and **aarch64/ARM** architectures using Docker containers. It receives input from an Intel RealSense camera and estimates the 6D pose for the object of interest using the camera's intrinsics.
+The module uses as baseline method the [EPOS](https://github.com/thodan/epos) (Estimating 6D Pose of Objects with Symmetries) method, adapted as a [ROS1 service](http://wiki.ros.org/Services) for integration on robotic platforms. Moreover, optimizations for improved time performance have been integrated, as well as support for deployment in Docker containers. The module can run on **x86_64** and **aarch64/ARM** architectures using Docker containers. It receives input from an Intel RealSense camera and estimates the 6D pose for the object of interest using the camera's intrinsics. The module also supports the estimation of the 6D pose of toolstands using an ArUco-based method. 
 
 Inference is supported:
 
@@ -13,40 +13,73 @@ You can use the [IndustryShapes dataset](https://zenodo.org/records/14616197) to
 # Test environment
 - x86: Ubuntu 20.04, [ROS Noetic](http://wiki.ros.org/noetic), [Intel RealSense D455](https://www.intelrealsense.com/depth-camera-d455/)
 - aarch64: Linux 5.10.104-tegra (equivalent of Ubuntu 20.04 for NVIDIA Jetson Orin/AGX platforms), ROS Noetic, Intel RealSense D455
+
     
 # Overview
-- base-arm: Contains the Dockerfile and necessary files to build a base image using the Linux 4 Tegra official image, with Opencv 4.7.0, CUDA 11.4, CUDNN 8.3.2.
-- ros-arm: Contains the Dockerfile and necessary files to build an image (custom-ros-arm) with the ROS Noetic distribution and necessary ROS packages
-- realsense-arm: Builds an image with the RealSense SDK (compiled from source) and ROS packages for building the Realsense ROS node.
-- epos-arm: Builds an image for EPOS. 
-- main-arm: Contains the files for the last image in the multi-stage build process.
-- catkin_ws: a ROS catkin workspace
-- main-arm: contains the Dockerfile for building the last image of the multi-stage build, as well as 2 scripts.
-    - main-arm/prepare_ws.sh checks if the odl and ROS Realsense packages are available. If the ROS Realsense package is not available, the script installs it from source. If odl is not available, it is built and installed with catkin_make. Note that the odl files should already be included in catkin_ws/src.
-    - main-arm/entrypoint.sh calls prepare_ws.sh and runs the ODL server script with `rosrun --prefix "/usr/bin/env python3" odl test_new_compact.py`
+Subfolders "x86", "arm" contain Dockerfiles to build Docker images packaging the module and its dependencies for x86 and arm architectures.
+- `base-<arch>`: Contains the Dockerfile and necessary files to build a base image with Ubuntu 20.04 or the aarch64 equivalent Linux 4 Tegra, OpenCV, CUDA, CUDNN and other dependencies.
+- `custom-ros-<arch>`: Contains the Dockerfile and necessary files to build an image with the ROS Noetic distribution and necessary ROS packages
+- `realsense-<arch>`: Builds an image with the RealSense SDK (compiled from source) and ROS packages for building the Realsense ROS node.
+- `epos-<arch>`: Builds an image for installing EPOS-related libraries. 
+- catkin_ws: a folder containing the source code of the module.
+- `main-<arch>`: contains the Dockerfile which installs TensorRT, as well as 2 scripts.
+    - `main-<arch>/prepare_ws.sh` builds a ROS package named "odl" which will run the service and installs the ROS Realsense package from source (the script first checks whether odl and ROS RealSense packages are available). 
+    - `main-<arch>/entrypoint.sh` calls `prepare_ws.sh` and runs the ROS service server script with `rosrun`.
 
-- `build_all.sh`: builds all the images in the following order: base-arm -> custom-ros-arm -> realsense-arm -> epos-arm -> main-arm
-- `run_with_ros.sh`: launches an interactive container of main-arm image. sandbox, catkin_ws as well as the host's `.bashrc` file are mounted to the container.
-- `run_new.sh`: uses the docker exec command to launch a new session attached to the most recent running container.
-- `launch_camera.sh`: Launches the RealSense ROS node for either 1280 x 720 or 640 x 480 resolutions. To run for 1280 x 720, run the script with 1280 as argument (./launch_camera.sh 1280). Otherwise, run it with 640 as argument. If a ROS node is already running and you wish to launch it for a different resolution, the script kills the ROS node and launches the correct one. It also handles the edge case of killing multiple ROS nodes which may persist.
-- `init-session.sh`: creates a tmux session with 4 panes. Receives the session name as argument. If the session already exists, it attaches to it.
+The following utility scripts have been implemented to handle the module:
+- `build_all.sh`: builds all the images in the following order: `base-<arch>` -> `custom-ros-<arch>` -> `realsense-<arch>` -> `epos-<arch>` -> `main-<arch>`. Run as
+```
+./build_all.sh <image_tag> <target_architecture>
+```
+where `<target_architecture>` = `x86` or `arm`
 
-### 2.2 Scripts in catkin_ws/src/odl/scripts
+- `run_container.sh`: launches an interactive container of a Docker image. sandbox, catkin_ws as well as the host's `.bashrc` file are mounted to the container. Run as
+```
+./run_container.sh <image name> <image tag>
+```
+- `run_new.sh`: uses the docker `exec` command to launch a new session attached to the most recent running container.
 
-Main executable : ```test_new_compact.py```
+- `launch_camera.sh`: Launches the RealSense ROS node for either 1280 x 720 or 640 x 480 resolutions. If a ROS node is already running and you wish to launch it for a different resolution, the script kills the ROS node and launches the correct one. It also handles the edge case of killing multiple ROS nodes which may persist. Run as 
+```
+./launch_camera.sh <width>
+```
+where "width" = 1280 or 640, in order to run for 1280 x 720 or 640 x 480 resolutions respectively.
+
+- `init_session.sh`: Determines the architecture of the host machine and creates a tmux session with 4 panes. 
+    - Pane 1: executes `./run_container.sh` which launches an interactive container for `main-x86` or `main-arm` images, depending on the architecture, and then executes `entrypoint.sh`.
+    - Pane 0 & 2: executes `run_new.sh`.
+
+<p align="left">
+  <img src="assets/tmux_session.png" width="640">
+</p>
+If the session already exists, it attaches to it. Run as 
+
+```
+./init_session.sh <session name> <docker image tag>
+```
+
+### 2.2 Scripts in catkin_ws/src/odl/
+
+## scripts
+```test_new_compact.py```: Main executable - ROS service server script. Instantiates an EPOS model, the service, camera subscribers.  
 
 Packages Description:
 
-- ```initialize.py```: Initializes an EPOS model. Given the attributes loaded by the ```config.yaml``` file initlizes and perform warmup with the model based on the method chosen (ONNX,TRT).
+- ```initialize.py```: Defines an EPOS model. Given the attributes loaded by the ```config.yaml``` file it initializes and performs warmup with the model using the chosen method (ONNX Runtime, TensorRT).
 - ```inout.py```: Mostly utility functions for reading and writing operations like saving images and correspondences.
 -  ```postprocessing.py```: Includes post-processing functions executed after the prediction is acquired.
--  ```profiler.py```: A class for timing different blocks of code, useful for analyzing the latency of the ODL module.
--  ```TensorRT.py```: The tensorRT class, that initializes by loading a trt engine, creating context, initializes and predicts with the trt model.
--  ```camera.py```: Class containing related camera tasks like callbacks to obtain image data from the camera stream and trigger the inference pipeline.
+-  ```profiler.py```: A class for timing different blocks of code, useful for analyzing the latency of the module.
+-  ```TensorRT.py```: The TensorRT class, that initializes by loading a trt engine, creating context, initializes and predicts with the trt model.
+-  ```camera.py```: Class containing camera-related tasks like callbacks to obtain image data from the camera stream and trigger the inference pipeline.
+- `ToolstandDetector_stable.py`: Performs detection and localization of toolstands (see section Toolstand detection)
+
+## msg, srv
+Custom ROS messages and service definitions. Building the workspace will result in a service being built named `object_pose`.
+
 # 1. Instructions
 ## 1.1. Setup
 
-Steps that should be carried out before launching the service. "Host" refers to the (physical or virtual) machine on which the Docker container will be deployed. "Root" directory refers to the repo directory (i.e. /some/path/i6DL-Edge)
+Steps that should be carried out the first time you use this repo. "Host" refers to the (physical or virtual) machine on which the Docker container will be deployed. "Root" directory refers to the repo directory (i.e. /some/path/i6DL-Edge)
 
 1. Clone the repo: `git clone --recursive https://github.com/POSE-Lab/i6DL-Edge.git`
 
@@ -70,30 +103,43 @@ export ROS_HOSTNAME=<IP OF HOST>
     - `decimated_models_prj`: folder with decimated 3D models
     - `tf_models`: folder to keep trained models.
     - `init_images`: Folder to include images to be used in the initialization/warmup phase when running the module. Images should be of dimensions either 1280 x 720 or 640 x 480.
-    - (optional) `test_images`: Images that can be used for test mode.
 
 Download the IndustryShapes dataset in bop_datasets (see section [Data](#data)). You can include any image from IndustryShapes in init_images. 
 
 5. Change to `docker` directory and build the Docker images 
-```
-./build_all.sh <image_tag> <target_architecture>
-```
-where `<target_architecture>` = `x86` or `arm`
 
 6. Install [tmux](https://github.com/tmux/tmux/wiki/Installing)
 
-1.2. Running the service
+7. Ensure your NVIDIA driver versions are >= 418.81.07
+
+8. Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) for enabling GPU support for Dockers
+
+## 1.2. Running the service
 
 - Edit `config.yml` in catkin_ws/src/odl/scripts appropriately (please refer to the file itself for details)
-- From the root directory, run the init_session.sh script as such:
- ```
- ./init_session.sh <session name> <docker image tag> <camera resolution>
- ```
- E.g. `./init_session.sh test_session latest 640`. This will create a tmux session with 4 panes. Pane 0: executes launch_camera.sh Pane 1: executes entrypoint.sh Pane 2: executes run_new.sh
-- If you want to request a pose for testing purposes, execute run_new.sh in pane 3, type rosservice call /object_pose followed by tab x 2 and input the object ID.
-- The image taken from the camera (or the image read if test mode is active) and the estimated pose are saved as image_raw.png and pose.txt respectively under `/root/sandbox/results/image_raw/Test_<timestamp>/<Object ID>`, where timestamp is the date and time the service is called.
 
-4. Misc info & troubleshooting
+- From the root directory, run the `init_session.sh` script as described in Overview
+ E.g. `./init_session.sh test_session latest`.
+
+- When you run `init_session.sh` for the first time, the catkin workspace is built and sourced. After the workspace is built, execute `launch_camera.sh` in either Pane 0 or 1 to launch the RealSense ROS node.
+
+- Request a pose: type in Pane 2 `rosservice call /object_pose` followed by tab x 2 and input the object ID (for which ID corresponds to each object refer to `config.yml`).
+
+- The image taken from the camera, the estimated pose, and the profiling are saved as image_raw.png, pose.txt, corr_ and profiling.json respectively under `/root/sandbox/results/image_raw/Test_<timestamp>/<Object ID>`, where timestamp is the date and time the service is called. The correspondences file is stored under `/root/sandbox/results/image_raw/Test_<timestamp>/<Object ID>/corr_/<timestamp>_corr`.
+
+## Toolstand detection
+The toolstand detection and localization should be specifically tailored for a target use case. This includes:
+- Defining an origin on the toolstand 
+- Changing the configuration in `config_toolstand.yaml` (e.g. ArUco grid parameters, toolstand corners according to its geometry)
+- Adapting the transformations (rotation + translation) in `ToolstandDetector_stable.py` by calculating the appropriate distances to the defined origin so that the 6D pose of the ArUco board, which is on the upper left corner on the grid by default, aligns with the origin.
+
+## Visualization
+Refer to **vis/README.md** for how to visualize the estimated poses and the detected inliers. Note that currently visualization is supported for **x86 only**, **outside** Docker. 
+
+## TensorRT inference
+
+
+# 4. Misc info & troubleshooting
 
 - Killing the tmux session: Ctrl + B, type ":", then enter `kill-session` in the yellow/orange prompt.
 
@@ -103,7 +149,7 @@ where `<target_architecture>` = `x86` or `arm`
 
 - Changes: Any changes done in catkin_ws, the sandbox, or the .bashrc from either the host or the container are visible from both the host and the container and persist when the container stops/is killed.
 
-    - Changes in the odl .py files only require re-running the server (either run ./entrypoint.sh or just rosrun --prefix "/usr/bin/env python3" odl - test_new_compact.py).
+    - Changes in the module .py files only require re-running the server (either run ./entrypoint.sh or just rosrun --prefix "/usr/bin/env python3" odl - test_new_compact.py).
     - Changes in config.yml require re-running the server.
     - Adding a new ROS package or changing the ROS message definition requires building the catkin workspace again with catkin_make. Please build the workspace **inside** the container.
     - Changes in either 1) any Dockerfile 2) the files in the odl folder (apart from the configuration files) 3) prepare_ws.sh 4) entrypoint.sh require running `build_all.sh` again, i.e. re-building the docker images.
