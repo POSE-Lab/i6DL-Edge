@@ -4,7 +4,7 @@ WORKDIR /tmp
 
 # Build Realsense SDK from source
 RUN  sudo apt-get update && sudo apt-get -y upgrade && sudo apt-get -y dist-upgrade
-RUN  git clone https://github.com/IntelRealSense/librealsense.git
+RUN  git clone https://github.com/IntelRealSense/librealsense.git && cd librealsense && git checkout tags/v2.50.0
 COPY ./docker/arm/realsense-arm/realsense_packages.txt ./realsense_packages.txt 
 RUN  sudo xargs -a ./realsense_packages.txt apt-get install -y
 RUN cd librealsense && ./scripts/setup_udev_rules.sh

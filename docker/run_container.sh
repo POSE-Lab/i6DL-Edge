@@ -20,6 +20,7 @@ echo "no environment file chosen"
   -v "$SANDBOX_HOST:$SANDBOX_CONTAINER:rw" \
   -v "$WS_HOST:$WS_CONTAINER:rw" \
   -v "$HOME/.bashrc:/$USER_CONTAINER/.bashrc:rw" \
+  --device=/dev/video0 \
   --net=host \
   --env="DISPLAY=$DISPLAY" \
     --init  \

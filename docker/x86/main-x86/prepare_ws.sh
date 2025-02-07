@@ -1,5 +1,5 @@
 #!/bin/bash
-
+mkdir -p /root/catkin_ws/src/odl/include
 cd ${HOME}/catkin_ws/src/
 # Check if the necessary packages are installed in 
 # workspace. Otherwise, install them

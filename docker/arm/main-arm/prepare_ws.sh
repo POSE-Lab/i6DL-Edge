@@ -1,5 +1,5 @@
 #!/bin/bash
-
+mkdir -p /root/catkin_ws/src/odl/include
 cd ${HOME}/catkin_ws/src/
 # Check if the necessary packages are installed in 
 # workspace. Otherwise, install them
@@ -9,10 +9,10 @@ cd ${HOME}/catkin_ws/src/
 p=$(rospack list-names | grep realsense2_camera)
 if [[ -z $p ]]; then
     echo "Package realsense2_camera not found, installing..."
-    git clone https://github.com/IntelRealSense/realsense-ros.git  
+    git clone https://github.com/POSE-Lab/realsense-ros-fork.git  
     source /opt/ros/noetic/setup.bash 
-    cd ${HOME}/catkin_ws/src/realsense-ros/ 
-    git checkout `git tag | sort -V | grep -P "^2.\d+\.\d+" | tail -1` 
+    cd ${HOME}/catkin_ws/src/realsense-ros-fork/ 
+    git switch docker_arm
 else
     echo "Package realsense2_camera found"
 fi

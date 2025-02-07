@@ -5,17 +5,18 @@ Inference is supported:
 
 - for the ONNX inference engine, using the trained models we provide (see section [Data](#data))
 
-- for the TensorRT inference engine (see TensorRT inference)
+- for the TensorRT inference engine (see [TensorRT inference](#tensorrt))
 
-# <a name="data"></a> Data
+# 1. <a name="data"></a> Data
 You can use the [IndustryShapes dataset](https://zenodo.org/records/14616197) to test the module with our [pre-trained models](https://ntuagr-my.sharepoint.com/:f:/r/personal/psapoutzoglou_ntua_gr/Documents/FELICE/DATA_CODE_MODELS/trained_models?csf=1&web=1&e=Wda6vx). Decimated 3D models that are also required for inference can be downloaded from [here](https://ntuagr-my.sharepoint.com/:f:/r/personal/psapoutzoglou_ntua_gr/Documents/FELICE/DATA_CODE_MODELS/trained_models?csf=1&web=1&e=I0bhEt). 
 
-# Test environment
+# 2. Test environment
 - x86: Ubuntu 20.04, [ROS Noetic](http://wiki.ros.org/noetic), [Intel RealSense D455](https://www.intelrealsense.com/depth-camera-d455/)
 - aarch64: Linux 5.10.104-tegra (equivalent of Ubuntu 20.04 for NVIDIA Jetson Orin/AGX platforms), ROS Noetic, Intel RealSense D455
 
     
-# Overview
+# 3. Overview
+## 3.1 Dockerfiles and utility scripts
 Subfolders "x86", "arm" contain Dockerfiles to build Docker images packaging the module and its dependencies for x86 and arm architectures.
 - `base-<arch>`: Contains the Dockerfile and necessary files to build a base image with Ubuntu 20.04 or the aarch64 equivalent Linux 4 Tegra, OpenCV, CUDA, CUDNN and other dependencies.
 - `custom-ros-<arch>`: Contains the Dockerfile and necessary files to build an image with the ROS Noetic distribution and necessary ROS packages
@@ -23,7 +24,7 @@ Subfolders "x86", "arm" contain Dockerfiles to build Docker images packaging the
 - `epos-<arch>`: Builds an image for installing EPOS-related libraries. 
 - catkin_ws: a folder containing the source code of the module.
 - `main-<arch>`: contains the Dockerfile which installs TensorRT, as well as 2 scripts.
-    - `main-<arch>/prepare_ws.sh` builds a ROS package named "odl" which will run the service and installs the ROS Realsense package from source (the script first checks whether odl and ROS RealSense packages are available). 
+    - `main-<arch>/prepare_ws.sh` builds a ROS package named "odl" which will run the service and installs the ROS Realsense package from source, from a patched fork that enables support for running the node in Docker on ARM .The script first checks whether odl and ROS RealSense packages are available. 
     - `main-<arch>/entrypoint.sh` calls `prepare_ws.sh` and runs the ROS service server script with `rosrun`.
 
 The following utility scripts have been implemented to handle the module:
@@ -58,8 +59,9 @@ If the session already exists, it attaches to it. Run as
 ./init_session.sh <session name> <docker image tag>
 ```
 
-### 2.2 Scripts in catkin_ws/src/odl/
+## 3.2 Scripts in catkin_ws/src/odl/
 
+Scripts implementing the main functionality of the module. 
 ## scripts
 ```test_new_compact.py```: Main executable - ROS service server script. Instantiates an EPOS model, the service, camera subscribers.  
 
@@ -76,8 +78,8 @@ Packages Description:
 ## msg, srv
 Custom ROS messages and service definitions. Building the workspace will result in a service being built named `object_pose`.
 
-# 1. Instructions
-## 1.1. Setup
+# 4. Instructions
+## 4.1 Setup
 
 Steps that should be carried out the first time you use this repo. "Host" refers to the (physical or virtual) machine on which the Docker container will be deployed. "Root" directory refers to the repo directory (i.e. /some/path/i6DL-Edge)
 
@@ -114,11 +116,13 @@ Download the IndustryShapes dataset in bop_datasets (see section [Data](#data)).
 
 8. Install [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) for enabling GPU support for Dockers
 
-## 1.2. Running the service
+## <a name="run_service"></a> 4.2 Running the service
+
+- Run rosmaster (`roscore`)
 
 - Edit `config.yml` in catkin_ws/src/odl/scripts appropriately (please refer to the file itself for details)
 
-- From the root directory, run the `init_session.sh` script as described in Overview
+- From the `docker` directory, run the `init_session.sh` script as described in Overview
  E.g. `./init_session.sh test_session latest`.
 
 - When you run `init_session.sh` for the first time, the catkin workspace is built and sourced. After the workspace is built, execute `launch_camera.sh` in either Pane 0 or 1 to launch the RealSense ROS node.
@@ -127,19 +131,56 @@ Download the IndustryShapes dataset in bop_datasets (see section [Data](#data)).
 
 - The image taken from the camera, the estimated pose, and the profiling are saved as image_raw.png, pose.txt, corr_ and profiling.json respectively under `/root/sandbox/results/image_raw/Test_<timestamp>/<Object ID>`, where timestamp is the date and time the service is called. The correspondences file is stored under `/root/sandbox/results/image_raw/Test_<timestamp>/<Object ID>/corr_/<timestamp>_corr`.
 
-## Toolstand detection
+## 4.3 Toolstand detection
 The toolstand detection and localization should be specifically tailored for a target use case. This includes:
 - Defining an origin on the toolstand 
 - Changing the configuration in `config_toolstand.yaml` (e.g. ArUco grid parameters, toolstand corners according to its geometry)
 - Adapting the transformations (rotation + translation) in `ToolstandDetector_stable.py` by calculating the appropriate distances to the defined origin so that the 6D pose of the ArUco board, which is on the upper left corner on the grid by default, aligns with the origin.
 
-## Visualization
+## 4.4 Visualization
 Refer to **vis/README.md** for how to visualize the estimated poses and the detected inliers. Note that currently visualization is supported for **x86 only**, **outside** Docker. 
 
-## TensorRT inference
+## <a name="tensorrt"></a> 3.5 [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/quick-start-guide/index.html) inference
+A TensorRT model, or engine (also called a plan) is optimized in a way that is heavily dependent on the underlying hardware. As a result, a TensorRT model is generally not portable across different GPU architectures. For this reason, we do not provide built TensorRT models. Instead, one should build the model (engine) themselves from the provided ONNX model using `trtexec`. 
 
+### FP16 and FP32 engine
+Run 
 
-# 4. Misc info & troubleshooting
+```
+/usr/src/tensorrt/bin/trtexec --onnx=/path/to/onnx/model --saveEngine=/path/to/output/engine --<precision> 
+
+```
+where `precision` = `fp16` or `fp32`
+
+### INT8 engine
+To create an INT8 engine, the pre-trained model (ONNX in this case) needs to be calibrated on a subset of the training data. After calibration, a cache file is generated, which will be used to generate the INT8 engine.
+
+- Run the calibration script included in catkin_ws/src/odl/scripts/utils:
+```
+python calibrator.py --calib_dataset_loc /path/to/bop_dataset/train_folder --saveCache /output/cache/filename (calibration file) --onnx /path/to/onnx/model --img_size height width channels --num_samples num_samples --batch_size batch_size 
+```
+Where
+
+`img_size`: image size of calibration images
+
+`num_samples`: Number of samples that will be randomly selected for every object (default: 300)
+
+`batch size`: Number of samples that will be processed in every iteration (batch size) (default: 64)
+
+e.g.
+
+```
+python calibrator.py --calib_dataset_loc /home/i6DL-Edge-Lite/store/train_primesense --saveCache /home/i6DL-Edge-Lite/store/crf12345AndLab123MI3/crf12345AndLab123MI3_640_int8.cache --onnx /home/i6DL-Edge-Lite/store/crf12345AndLab123MI3/crf12345AndLab123MI3_640.onnx --img_size 480 640 3 --num_samples 100 --batch_size 4
+```
+
+- Build the engine:
+```
+/usr/src/tensorrt/bin/trtexec --onnx=/path/to/onnx/model --saveEngine=path/to/output/engine --int8 --calib=/path/to/calib/cache
+```
+### Inference
+In the YAML configuration file, change the `method` field to `trt`, and the `trt` field to the path of the TensorRT engine you created. Run the service as described in [3.2 Running the service](#run_service).
+
+# 5. Misc info & troubleshooting
 
 - Killing the tmux session: Ctrl + B, type ":", then enter `kill-session` in the yellow/orange prompt.
 
