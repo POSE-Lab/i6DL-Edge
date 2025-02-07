@@ -2,6 +2,7 @@
 <p align="left">
   <img src="assets/objects2.png">
 </p>
+
 The module uses as baseline method the [EPOS](https://github.com/thodan/epos) (Estimating 6D Pose of Objects with Symmetries) method, adapted as a [ROS1 service](http://wiki.ros.org/Services) for integration on robotic platforms. Moreover, optimizations for improved time performance have been integrated, as well as support for deployment in Docker containers. The module can run on **x86_64** and **aarch64/ARM** architectures using Docker containers. It receives input from an Intel RealSense camera and estimates the 6D pose for the object of interest using the camera's intrinsics. The module also supports the estimation of the 6D pose of toolstands using an ArUco-based method. 
 
 Inference is supported:
