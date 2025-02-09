@@ -22,13 +22,13 @@ You can use the [IndustryShapes dataset](https://zenodo.org/records/14616197) to
 # 3. Overview
 ## 3.1 Dockerfiles and utility scripts
 Subfolders "x86", "arm" contain Dockerfiles to build Docker images packaging the module and its dependencies for x86 and arm architectures.
-- `base-<arch>`: Contains the Dockerfile and necessary files to build a base image with Ubuntu 20.04 or the aarch64 equivalent Linux 4 Tegra, OpenCV, CUDA, CUDNN and other dependencies.
+- `base-<arch>`: Contains the Dockerfile and necessary files to build a base image with Ubuntu 20.04 or the aarch64 equivalent Linux 4 Tegra, OpenCV, CUDA, CUDNN and other dependencies. It uses a [custom OpenCV fork](https://github.com/POSE-Lab/opencv_fork/tree/4.7.0-modified) to remove the requirement of the DLT algorithm needing at least 6 points for pose estimation from 3D-2D point correspondences.
 - `custom-ros-<arch>`: Contains the Dockerfile and necessary files to build an image with the ROS Noetic distribution and necessary ROS packages
 - `realsense-<arch>`: Builds an image with the RealSense SDK (compiled from source) and ROS packages for building the Realsense ROS node.
 - `epos-<arch>`: Builds an image for installing EPOS-related libraries. 
 - catkin_ws: a folder containing the source code of the module.
 - `main-<arch>`: contains the Dockerfile which installs TensorRT, as well as 2 scripts.
-    - `main-<arch>/prepare_ws.sh` builds a ROS package named "odl" which will run the service and installs the ROS Realsense package from source, from a patched fork that enables support for running the node in Docker on ARM .The script first checks whether odl and ROS RealSense packages are available. 
+    - `main-<arch>/prepare_ws.sh` builds a ROS package named "odl" which will run the service and installs the ROS Realsense package from source. The ARM version uses a [patched fork](https://github.com/POSE-Lab/realsense-ros-fork/tree/docker_arm) that enables support for running the node in Docker on ARM .The script first checks whether odl and ROS RealSense packages are available. 
     - `main-<arch>/entrypoint.sh` calls `prepare_ws.sh` and runs the ROS service server script with `rosrun`.
 
 The following utility scripts have been implemented to handle the module:
