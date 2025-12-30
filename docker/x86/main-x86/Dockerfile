@@ -24,7 +24,17 @@ COPY ./docker/x86/main-x86/entrypoint.sh .
 RUN chmod +x ./prepare_ws.sh ./entrypoint.sh
 
 RUN pip3 install pycuda --verbose
-RUN pip install tensorrt
+RUN apt-get update && apt-get -y install --fix-broken libnvinfer8=8.5.2-1+cuda11.8 \
+libnvinfer-bin=8.5.2-1+cuda11.8 \
+libnvinfer-plugin8=8.5.2-1+cuda11.8 \
+libnvparsers8=8.5.2-1+cuda11.8 \
+libnvonnxparsers8=8.5.2-1+cuda11.8 \
+python3-libnvinfer=8.5.2-1+cuda11.8 \
+libnvinfer-dev=8.5.2-1+cuda11.8 \
+libnvinfer-plugin-dev=8.5.2-1+cuda11.8 \
+libnvparsers-dev=8.5.2-1+cuda11.8 \
+libnvonnxparsers-dev=8.5.2-1+cuda11.8 \
+python3-libnvinfer-dev=8.5.2-1+cuda11.8
 RUN pip install plyfile
 RUN apt-get update && apt-get install -y ros-noetic-rqt-image-view
 
