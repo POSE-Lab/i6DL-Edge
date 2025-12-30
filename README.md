@@ -15,11 +15,12 @@ Inference is supported:
 You can use the [IndustryShapes dataset](https://zenodo.org/records/14616197) to test the module with our [pre-trained models](https://ntuagr-my.sharepoint.com/:f:/r/personal/psapoutzoglou_ntua_gr/Documents/FELICE/DATA_CODE_MODELS/trained_models?csf=1&web=1&e=Wda6vx). Decimated 3D models that are also required for inference can be downloaded from [here](https://ntuagr-my.sharepoint.com/:f:/r/personal/psapoutzoglou_ntua_gr/Documents/FELICE/DATA_CODE_MODELS/trained_models?csf=1&web=1&e=I0bhEt). 
 
 # 2. Test environment
+The module was tested on x86 and aarch64 hosts (physical machines) with the following specifications: 
 - x86: Ubuntu 20.04, [ROS Noetic](http://wiki.ros.org/noetic), [Intel RealSense D455](https://www.intelrealsense.com/depth-camera-d455/)
 - aarch64: Linux 5.10.104-tegra (equivalent of Ubuntu 20.04 for NVIDIA Jetson Orin/AGX platforms), ROS Noetic, Intel RealSense D455
 
     
-# 3. Overview
+# <a name="overview"></a> 3. Overview
 ## 3.1 Dockerfiles and utility scripts
 Subfolders "x86", "arm" contain Dockerfiles to build Docker images packaging the module and its dependencies for x86 and arm architectures.
 - `base-<arch>`: Contains the Dockerfile and necessary files to build a base image with Ubuntu 20.04 or the aarch64 equivalent Linux 4 Tegra, OpenCV, CUDA, CUDNN and other dependencies. It uses a [custom OpenCV fork](https://github.com/POSE-Lab/opencv_fork/tree/4.7.0-modified) to remove the requirement of the DLT algorithm needing at least 6 points for pose estimation from 3D-2D point correspondences.
@@ -89,7 +90,7 @@ Steps that should be carried out the first time you use this repo. "Host" refers
 
 1. Clone the repo: `git clone --recursive https://github.com/POSE-Lab/i6DL-Edge.git`
 
-2. If you plan on running the rosmaster on the same host as the module, you also need to install ROS.
+2. If you plan on running the rosmaster on the same host as the module, you also need to [install ROS](https://wiki.ros.org/noetic/Installation/Ubuntu).
 
 2. Add the following lines to `.bashrc` in the host
 
@@ -124,7 +125,7 @@ Download the IndustryShapes dataset in bop_datasets (see section [Data](#data)).
 
 - Run rosmaster (`roscore`)
 
-- Edit `config.yml` in catkin_ws/src/odl/scripts appropriately (please refer to the file itself for details)
+- Edit the service configuration file [config.yml](catkin_ws/src/odl/scripts/config.yml) in `catkin_ws/src/odl/scripts` appropriately (please refer to the file itself for details)
 
 - From the `docker` directory, run the `init_session.sh` script as described in Overview
  E.g. `./init_session.sh test_session latest`.
@@ -138,14 +139,14 @@ Download the IndustryShapes dataset in bop_datasets (see section [Data](#data)).
 ## 4.3 Toolstand detection
 The toolstand detection and localization should be specifically tailored for a target use case. This includes:
 - Defining an origin on the toolstand 
-- Changing the configuration in `config_toolstand.yaml` (e.g. ArUco grid parameters, toolstand corners according to its geometry)
+- Changing the configuration in [config_toolstand.yaml](catkin_ws/src/odl/scripts/config_toolstand.yaml) (e.g. ArUco grid parameters, toolstand corners according to its geometry)
 - Adapting the transformations (rotation + translation) in `ToolstandDetector_stable.py` by calculating the appropriate distances to the defined origin so that the 6D pose of the ArUco board, which is on the upper left corner on the grid by default, aligns with the origin.
 
 ## 4.4 Visualization
-Refer to **vis/README.md** for how to visualize the estimated poses and the detected inliers. Note that currently visualization is supported for **x86 only**, **outside** Docker. 
+Refer to [vis/README.md](vis/README.md) for how to visualize the estimated poses and the detected inliers. Note that currently visualization is supported for **x86 only**, **outside** Docker. 
 
 ## <a name="tensorrt"></a> 3.5 [TensorRT](https://docs.nvidia.com/deeplearning/tensorrt/quick-start-guide/index.html) inference
-A TensorRT model, or engine (also called a plan) is optimized in a way that is heavily dependent on the underlying hardware. As a result, a TensorRT model is generally not portable across different GPU architectures. For this reason, we do not provide built TensorRT models. Instead, one should build the model (engine) themselves from the provided ONNX model using `trtexec`. 
+A TensorRT model, or engine (also called a plan) is optimized in a way that is heavily dependent on the underlying hardware. As a result, a TensorRT model is generally not portable across different GPU architectures. For this reason, we do not provide built TensorRT models. Instead, one should build the model (engine) themselves from the provided ONNX model using `trtexec`. Note that the TensorRT models should be built *inside* the Docker container. 
 
 ### FP16 and FP32 engine
 Run 
