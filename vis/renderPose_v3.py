@@ -104,7 +104,7 @@ def main(arg):
             logging.debug("Rendering model with id %s",objID)
             image_path = os.path.join(tf,obj_fld) + "/image_raw.png"
             pose_file = os.path.join(tf,obj_fld) + "/pose.txt"
-            current_model = [_ for _ in models if _[0] == objID+".ply"] #TODO
+            current_model = [_ for _ in models if _[0] == "obj_"+str(objID).zfill(6)+".ply"] #TODO
             renderer.create_buffers(current_model[0][1],current_model[0][2],attrs=[2,3,4])
 
             glBindFramebuffer(GL_FRAMEBUFFER, renderer.framebuffer.ID)
@@ -120,6 +120,7 @@ def main(arg):
                         conf = np.round(float(temp[-1]),2)
             logging.debug(K)
             K = np.array(K).reshape(3,3).astype(float)
+            print('!!! K MATRIX', K)
             proj = [ 2 * K[0,0] / float(FBO_WIDTH),     -2 * 0 / float(FBO_WIDTH) ,     0,    0,
             0,                       2 * K[1,1] / float(FBO_HEIGHT),      0,   0,
             1 - 2 * (K[0,2] / float(FBO_WIDTH)),      2 * (K[1,2] / float(FBO_HEIGHT)) - 1,   -(farP + nearP) / (farP - nearP),       -1,
